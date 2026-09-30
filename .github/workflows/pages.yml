@@ -33,6 +33,8 @@ jobs:
           fi
           mkdir _site
           cp index.html app.js condos.js styles.css _site/
+          mkdir -p _site/vendor/leaflet
+          cp vendor/leaflet/leaflet.css vendor/leaflet/leaflet.js vendor/leaflet/LICENSE _site/vendor/leaflet/
           printf 'window.APP_MAPBOX_TOKEN = "%s";\n' "$MAPBOX_TOKEN" > _site/mapbox-config.local.js
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v4
