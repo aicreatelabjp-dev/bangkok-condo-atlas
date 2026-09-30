@@ -1,0 +1,42 @@
+name: Publish Condo Atlas
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Build static site
+        env:
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+        run: |
+          if [[ ! "$MAPBOX_TOKEN" =~ ^pk\.[A-Za-z0-9._-]+$ ]]; then
+            echo 'A public Mapbox pk token is required' >&2
+            exit 1
+          fi
+          mkdir _site
+          cp index.html app.js condos.js styles.css _site/
+          printf 'window.APP_MAPBOX_TOKEN = "%s";\n' "$MAPBOX_TOKEN" > _site/mapbox-config.local.js
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
