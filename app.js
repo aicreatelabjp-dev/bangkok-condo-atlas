@@ -138,7 +138,10 @@
       } else {
         const target = document.querySelector(`tr[data-id="${id}"]`);
         const table = document.querySelector('.table-wrap');
-        if(target && table) table.scrollTo({top:table.scrollTop + target.offsetTop - table.offsetTop - table.clientHeight / 2,behavior:'smooth'});
+        if(target && table) table.scrollTo({
+          top:table.scrollTop + target.getBoundingClientRect().top - table.getBoundingClientRect().top - (table.clientHeight - target.offsetHeight) / 2,
+          behavior:'smooth'
+        });
       }
     }
   }
