@@ -9,6 +9,8 @@
     th: { propertyPrice:'อาคาร / ค่าเช่าต่อเดือน', month:' / เดือน', priceNote:'ราคาเช่าในประกาศอาจเปลี่ยนแปลง; รายการที่ยังไม่ตรวจสอบจะแสดงแยกไว้' },
     ja: { propertyPrice:'建物 / 月額賃料', month:' / 月', priceNote:'掲載賃料は変動します。再確認が必要な部屋は個別に表示しています。' }
   };
+  copy.th.edition = 'ฉบับตรวจสอบ · ตุลาคม 2026';
+  copy.ja.edition = '2026年10月 確認版';
   let language = 'th';
   let selected = entries[0].id;
   let sort = 'number';
