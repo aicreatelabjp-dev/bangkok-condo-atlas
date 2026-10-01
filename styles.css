@@ -28,3 +28,7 @@ td:first-child .rent-price{display:block;color:var(--teal);margin:5px 0 0 35px}
 .occupancy-note{display:block;color:var(--orange);font-size:11px;line-height:1.45;font-weight:700;white-space:normal}
 td:first-child .occupancy-note{margin:3px 0 0 35px;max-width:220px}
 .card .occupancy-note{margin:0 0 9px}
+.onsen-badge{display:inline-block;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:700;white-space:normal;cursor:help}
+.onsen-badge.listed{background:#d8ecdf;color:#176746}
+.onsen-badge.unconfirmed{background:#e8e9e3;color:#6d756e}
+.mini{flex-wrap:wrap;white-space:normal}
