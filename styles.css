@@ -23,3 +23,6 @@
 .schematic-pin.like,.pin.like{background:var(--teal)}
 .schematic-pin.dislike,.pin.dislike{background:#a36a56}
 .map-fallback::after{content:'COORDINATE OVERVIEW  /  NOT A WALKING ROUTE';position:absolute;left:18px;bottom:15px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.08em;background:#f8faf2dd;padding:6px 9px;border-radius:3px}
+td:nth-child(5){min-width:120px}
+td:nth-child(6){min-width:140px}
+.rent-price{color:var(--teal);font-weight:700;white-space:nowrap}
