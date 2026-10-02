@@ -32,3 +32,13 @@ td:first-child .occupancy-note{margin:3px 0 0 35px;max-width:220px}
 .onsen-badge.listed{background:#d8ecdf;color:#176746}
 .onsen-badge.unconfirmed{background:#e8e9e3;color:#6d756e}
 .mini{flex-wrap:wrap;white-space:normal}
+.recommendation-rank{display:inline-block;color:var(--orange);font-size:11px;font-weight:700}
+td:first-child .recommendation-rank{display:block;margin:3px 0 0 35px;color:var(--orange)}
+.shuttle-badge{display:inline-block;max-width:165px;padding:3px 6px;border-radius:3px;background:#e8e9e3;color:#52615b;font-size:10px;font-weight:700;line-height:1.4;white-space:normal;cursor:help}
+.shuttle-badge.free-advertised{background:#e2f0e7;color:#176746}
+.shuttle-badge.reported{background:#fff0d5;color:#825323}
+.ranking-shuttle{margin:0 0 24px;padding:13px 16px;background:#f1f5ee;border-left:3px solid var(--teal)}
+.ranking-shuttle .recommendation-rank{font-size:13px}
+.shuttle-detail{margin:7px 0 0;font-size:13px;line-height:1.6}
+.shuttle-detail a{white-space:nowrap}
+.card-status .shuttle-badge{margin-top:6px}

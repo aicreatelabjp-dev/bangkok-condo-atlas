@@ -12,8 +12,8 @@
   copy.th.edition = 'ฉบับตรวจสอบ · ตุลาคม 2026';
   copy.ja.edition = '2026年10月 確認版';
   let language = 'th';
-  let selected = entries[0].id;
-  let sort = 'number';
+  let selected = entries.find(entry => entry.recommendationRank === 1).id;
+  let sort = 'recommended';
   const voteKey = 'bangkok-condo-votes-v1';
   const visitorKey = 'bangkok-condo-visitor-v1';
   const migratedKey = 'bangkok-condo-votes-server-migrated-v1';
@@ -38,6 +38,8 @@
   let map;
   const markers = new Map();
   const $ = id => document.getElementById(id);
+  Object.assign(priceCopy.th, { recommended: 'แนะนำตามสิ่งอำนวยความสะดวก', number: 'หมายเลขแผนที่ (ตะวันออก → ตะวันตก)' });
+  Object.assign(priceCopy.ja, { recommended: 'おすすめ順（共用設備）', number: '地図番号順（東→西）' });
   const t = key => key === 'unknown' ? 'ー' : priceCopy[language][key] || copy[language][key];
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const value = state => {
@@ -49,6 +51,17 @@
   };
   const num = n => Number(n).toLocaleString(language === 'th' ? 'th-TH' : 'ja-JP');
   const rent = amount => amount === null ? t('unknown') : `฿${num(amount)}${t('month')}`;
+  const mapNumber = entry => String(entry.mapNumber).padStart(2, '0');
+  const rankLabel = entry => language === 'th' ? `อันดับแนะนำ ${entry.recommendationRank}` : `おすすめ ${entry.recommendationRank}位`;
+  const shuttleBadge = entry => {
+    const label = entry.shuttle.shuttle === 'free-advertised'
+      ? (language === 'th' ? 'มีโฆษณารถรับส่งฟรี' : '無料送迎の広告あり')
+      : entry.shuttle.shuttle === 'reported'
+        ? (language === 'th' ? 'มีข้อมูลรถรับส่ง' : '送迎の掲載あり')
+        : (language === 'th' ? 'รถรับส่งฟรียังไม่ยืนยัน' : '無料送迎は未確認');
+    return `<span class="shuttle-badge ${entry.shuttle.shuttle}" title="${esc(entry.shuttle.note[language])}">${label}</span>`;
+  };
+  const shuttleDetail = entry => `<p class="shuttle-detail"><strong>${language === 'th' ? 'รถรับส่งไปสถานี' : '駅への送迎'}:</strong> ${esc(entry.shuttle.note[language])}${entry.shuttle.source ? ` <a href="${entry.shuttle.source}" target="_blank" rel="noopener noreferrer">${language === 'th' ? 'แหล่งข้อมูล' : '根拠'} ↗</a>` : ''}</p>`;
   const onsen = building => {
     const info = building.onsen;
     const state = info ? info.listed : building.bath;
@@ -80,7 +93,7 @@
   }
   function mapVote() {
     const e = entries.find(item => item.id === selected);
-    $('map-vote').innerHTML = `<strong>${String(e.id).padStart(2, '0')} ${esc(e.name)}</strong>${voteControls(e.id)}`;
+    $('map-vote').innerHTML = `<strong>${mapNumber(e)} ${esc(e.name)}</strong>${voteControls(e.id)}`;
   }
   async function setVote(id, choice) {
     if (pendingVotes.has(id)) return;
@@ -135,11 +148,11 @@
     const alternate = String(building.yearConflict || '').match(/\b(?:19|20)\d{2}\b/);
     return alternate ? Math.min(building.year, Number(alternate[0])) : building.year;
   };
-  const order = () => [...entries].sort((a,b) => sort==='distance' ? a.building.distance-b.building.distance : sort==='year' ? completionYear(b.building)-completionYear(a.building) : sort==='area' ? b.unit.area-a.unit.area : a.id-b.id);
+  const order = () => [...entries].sort((a,b) => sort==='distance' ? a.building.distance-b.building.distance : sort==='year' ? completionYear(b.building)-completionYear(a.building) : sort==='area' ? b.unit.area-a.unit.area : sort==='number' ? a.mapNumber-b.mapNumber : a.recommendationRank-b.recommendationRank);
   function rows() {
     $('table-head').innerHTML = ['propertyPrice','transit','yearHead','areaHead','facilities'].map(x=>`<th>${t(x)}</th>`).join('');
-    $('table-body').innerHTML = order().map(e => `<tr data-id="${e.id}" class="${selected===e.id?'active':''}"><td><button type="button" class="row-pick" data-id="${e.id}" aria-label="${esc(e.name)}">${e.id.toString().padStart(2,'0')}</button><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer">${esc(e.name)} ↗</a><span class="rent-price">${rent(e.unit.rent)}</span>${rentNote(e.unit)?`<small>${rentNote(e.unit)}</small>`:''}${occupancyNote(e)?`<small class="occupancy-note">${esc(occupancyNote(e))}</small>`:''}</td><td><strong>${esc(e.building.station)}</strong><span>${num(e.building.distance)} m</span></td><td>${age(completionYear(e.building))}</td><td><strong>${num(e.unit.area)} m²</strong><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></td><td><div class="mini">${value(e.building.pool)} ${value(e.building.sauna)} ${value(e.building.cowork)} ${onsen(e.building)}</div></td></tr>`).join('');
-    $('cards').innerHTML = order().map(e => `<article data-id="${e.id}" class="card ${selected===e.id?'active':''}"><button type="button" class="card-select" data-id="${e.id}"><span class="card-number">${e.id.toString().padStart(2,'0')}</span><span><strong>${esc(e.name)}</strong><small>${esc(e.building.station)} · ${num(e.building.distance)} m</small></span><span class="arrow">↗</span></button><div class="card-facts"><span class="rent-price">${rent(e.unit.rent)}</span><span>${num(e.unit.area)} m²</span><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></div>${rentNote(e.unit)?`<p class="hint">${rentNote(e.unit)}</p>`:''}${occupancyNote(e)?`<p class="occupancy-note">${esc(occupancyNote(e))}</p>`:''}<div class="card-status">${t('pool')}: ${value(e.building.pool)} &nbsp; ${t('sauna')}: ${value(e.building.sauna)} &nbsp; ${t('cowork')}: ${value(e.building.cowork)} &nbsp; ${onsen(e.building)}</div><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer" class="listing-link">${t('photos')} ↗</a></article>`).join('');
+    $('table-body').innerHTML = order().map(e => `<tr data-id="${e.id}" class="${selected===e.id?'active':''}"><td><button type="button" class="row-pick" data-id="${e.id}" aria-label="${esc(e.name)}">${mapNumber(e)}</button><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer">${esc(e.name)} ↗</a><span class="recommendation-rank">${rankLabel(e)}</span><span class="rent-price">${rent(e.unit.rent)}</span>${rentNote(e.unit)?`<small>${rentNote(e.unit)}</small>`:''}${occupancyNote(e)?`<small class="occupancy-note">${esc(occupancyNote(e))}</small>`:''}</td><td><strong>${esc(e.building.station)}</strong><span>${num(e.building.distance)} m</span></td><td>${age(completionYear(e.building))}</td><td><strong>${num(e.unit.area)} m²</strong><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></td><td><div class="mini">${value(e.building.pool)} ${value(e.building.sauna)} ${value(e.building.cowork)} ${onsen(e.building)} ${shuttleBadge(e)}</div></td></tr>`).join('');
+    $('cards').innerHTML = order().map(e => `<article data-id="${e.id}" class="card ${selected===e.id?'active':''}"><button type="button" class="card-select" data-id="${e.id}"><span class="card-number">${mapNumber(e)}</span><span><strong>${esc(e.name)}</strong><small>${rankLabel(e)} · ${esc(e.building.station)} · ${num(e.building.distance)} m</small></span><span class="arrow">↗</span></button><div class="card-facts"><span class="rent-price">${rent(e.unit.rent)}</span><span>${num(e.unit.area)} m²</span><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></div>${rentNote(e.unit)?`<p class="hint">${rentNote(e.unit)}</p>`:''}${occupancyNote(e)?`<p class="occupancy-note">${esc(occupancyNote(e))}</p>`:''}<div class="card-status">${t('pool')}: ${value(e.building.pool)} &nbsp; ${t('sauna')}: ${value(e.building.sauna)} &nbsp; ${t('cowork')}: ${value(e.building.cowork)} &nbsp; ${onsen(e.building)} &nbsp; ${shuttleBadge(e)}</div><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer" class="listing-link">${t('photos')} ↗</a></article>`).join('');
     document.querySelectorAll('.row-pick,.card-select').forEach(el=>el.addEventListener('click',()=>choose(Number(el.dataset.id),true)));
     $('count').textContent = `${entries.length} / ${window.CONDOS.length}`;
   }
@@ -147,6 +160,8 @@
     const e = entries.find(x=>x.id===selected), b=e.building, u=e.unit;
     $('detail').innerHTML = `<div class="detail-title"><span class="detail-num">${String(e.id).padStart(2,'0')}</span><div><p class="overline">${t('details')}</p><h2>${esc(e.name)}</h2></div></div><div class="detail-grid"><div><h3>${t('unit')}</h3><p>${num(u.area)} m² · ${u.floor===null?t('unknown'):`${num(u.floor)} ${t('floor')}`}</p><p class="rent-price">${rent(u.rent)}</p>${rentNote(u)?`<p class="hint">${rentNote(u)}</p>`:''}${occupancyNote(e)?`<p class="conflict-note">${esc(occupancyNote(e))}</p>`:''}<a href="${u.url}" target="_blank" rel="noopener noreferrer">${t('photos')} ↗</a><p class="hint">${e.gallery==='modal'?t('photoHint'):t('photoUnavailable')}</p></div><div><h3>${t('building')}</h3><dl><dt>${t('pool')}</dt><dd>${value(b.pool)}</dd><dt>${t('sauna')}</dt><dd>${value(b.sauna)}</dd><dt>${t('cowork')}</dt><dd>${value(b.cowork)}</dd><dt>${t('bath')}</dt><dd>${onsen(b)}</dd></dl>${b.onsen?`<p class="hint">${esc(b.onsen.note[language])}</p>`:''}<p>${esc(b.other[language])}</p></div><div><h3>${t('sources')}</h3><ul class="sources"><li><a href="${u.url}" target="_blank" rel="noopener noreferrer">${new URL(u.url).hostname} · ${t('unit')}</a></li><li><a href="${b.url}" target="_blank" rel="noopener noreferrer">${new URL(b.url).hostname} · ${t('building')}</a></li>${b.extra.map((url,i)=>`<li><a href="${url}" target="_blank" rel="noopener noreferrer">${new URL(url).hostname} · ${i+1}</a></li>`).join('')}<li><a href="${b.coordinateSource}" target="_blank" rel="noopener noreferrer">${t('coordinate')} · ${new URL(b.coordinateSource).hostname}</a></li></ul>${b.coordinateCaveat?`<p class="conflict-note">${t('caveat')}</p>`:''}<small>${t('checked')} ${checked}</small></div></div>`;
     $('detail').querySelector('.detail-title').insertAdjacentHTML('afterend', voteControls(e.id));
+    $('detail').querySelector('.detail-num').textContent = mapNumber(e);
+    $('detail').querySelector('.vote-controls').insertAdjacentHTML('afterend', `<div class="ranking-shuttle"><span class="recommendation-rank">${rankLabel(e)}</span>${shuttleDetail(e)}</div>`);
     $('detail').querySelectorAll('.vote-button').forEach(button => button.addEventListener('click', () => setVote(Number(button.dataset.id), button.dataset.vote)));
   }
   function choose(id, fly, reveal=false) {
@@ -172,7 +187,7 @@
   function pin(id,active) {
     return L.divIcon({
       className:'pin-wrap',
-      html:`<span class="pin ${active?'active':''} ${votes[id] || ''}"><span>${String(id).padStart(2,'0')}</span></span>`,
+      html:`<span class="pin ${active?'active':''} ${votes[id] || ''}"><span>${mapNumber(entries.find(entry => entry.id === id))}</span></span>`,
       iconSize:[40,40],iconAnchor:[20,20]
     });
   }
@@ -189,7 +204,7 @@
     fallback.innerHTML=`<div class="schematic-heading">BANGKOK <span>${entries.length} / ${window.CONDOS.length}</span></div><div class="schematic-north" aria-hidden="true">N ↑</div>${entries.map(e=>{
       const left=8+84*(e.building.lng-minLng)/(maxLng-minLng);
       const top=8+84*(maxLat-e.building.lat)/(maxLat-minLat);
-      return `<button class="schematic-pin ${selected===e.id?'active':''} ${votes[e.id] || ''}" type="button" data-id="${e.id}" title="${esc(e.name)}" aria-label="${esc(e.name)}" style="left:${left.toFixed(3)}%;top:${top.toFixed(3)}%">${String(e.id).padStart(2,'0')}</button>`;
+      return `<button class="schematic-pin ${selected===e.id?'active':''} ${votes[e.id] || ''}" type="button" data-id="${e.id}" title="${esc(e.name)}" aria-label="${esc(e.name)}" style="left:${left.toFixed(3)}%;top:${top.toFixed(3)}%">${mapNumber(e)}</button>`;
     }).join('')}`;
     fallback.querySelectorAll('.schematic-pin').forEach(button=>button.addEventListener('click',()=>choose(Number(button.dataset.id),false,true)));
   }

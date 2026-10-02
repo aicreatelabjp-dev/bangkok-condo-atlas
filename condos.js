@@ -40,3 +40,27 @@ window.PUBLIC_CONDOS = window.CONDOS.filter(entry =>
   Date.now() - Date.parse(entry.unit.priceCheckedAt) < 31 * 86400000
 );
 window.REVIEW_CONDOS = window.CONDOS.filter(entry => !window.PUBLIC_CONDOS.includes(entry));
+
+// Stable IDs remain unchanged for saved votes. Map numbers are geographic labels only.
+const recommendations = [
+  { id: 7, rank: 1, shuttle: 'free-advertised', source: 'https://www.instagram.com/reel/DKzaZBqOPQb/', note: { th: 'มีโฆษณาระบุรถรับส่งฟรีไป BTS ทองหล่อ; ตารางเดินรถและสิทธิ์ของผู้พักอาศัยปัจจุบันยังไม่ยืนยัน', ja: 'BTSトンロー行き無料送迎の案内あり。現行ダイヤ・居住者の利用条件は未確認' } },
+  { id: 16, rank: 2, shuttle: 'unverified', source: 'https://propertyhub.in.th/en/condo-for-rent/project-knightsbridge-space-rama-9', note: { th: 'มีการกล่าวถึงรถรับส่ง แต่ยังยืนยันบริการและการใช้ฟรีไม่ได้', ja: '送迎への言及あり。ただしサービスの有無・無料かは確認できていません' } },
+  { id: 17, rank: 3, shuttle: 'free-advertised', source: 'https://bkk-homes.com/properties/thong-lo/vtara-sukhumvit-36--txYQ72cXazHCAUN5Ruhh', note: { th: 'โฆษณาเช่าระบุรถรับส่งฟรีไป BTS ทองหล่อ; ตารางเดินรถและเงื่อนไขปัจจุบันยังไม่ยืนยัน', ja: 'BTSトンロー行き無料送迎との賃貸広告あり。現行ダイヤ・利用条件は未確認' } },
+  { id: 4, rank: 4, shuttle: 'unverified', source: null, note: { th: 'ยังไม่มีหลักฐานยืนยันรถรับส่งฟรีของอาคารนี้; อย่าสับสนกับโครงการอื่นบนสุขุมวิท 93', ja: 'この建物の無料送迎は未確認。他のSukhumvit 93物件の広告と混同しないでください' } },
+  { id: 3, rank: 5, shuttle: 'reported', source: 'https://www.superagent.co/en/blog/the-waterford-diamond-sukhumvit-30-classic-mid-sukhumvit-condo-reviewed', note: { th: 'รีวิวอาคารกล่าวถึงรถรับส่ง แต่ยังไม่ยืนยันว่าฟรีหรือยังให้บริการอยู่', ja: '建物レビューに送迎への言及あり。無料か・現行運行かは未確認' } },
+  { id: 15, rank: 6, shuttle: 'free-advertised', source: 'https://goodyieldprop.com/property/rama-9-ratchada-huai-khwang-rca-suthisan/tc-green-rama-9-gy-mumja6ao', note: { th: 'โฆษณาเช่าระบุรถรับส่งฟรีไป MRT พระราม 9; ยังไม่ยืนยันการเดินรถปัจจุบัน', ja: 'MRT Rama 9行き無料送迎との賃貸広告あり。現行運行は未確認' } },
+  { id: 5, rank: 7, shuttle: 'reported', source: 'https://condoreviewsthailand.com/buildings/15-sukhumvit-residences', note: { th: 'รีวิวกล่าวถึงรถตุ๊กตุ๊กรับส่ง แต่ยังไม่ยืนยันว่าฟรีหรือยังให้บริการอยู่', ja: 'トゥクトゥク送迎への言及あり。無料か・現行運行かは未確認' } },
+  { id: 1, rank: 8, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; ไม่ได้หมายความว่าไม่มีบริการ', ja: '無料送迎は確認できず。送迎なしと断定するものではありません' } },
+  { id: 8, rank: 9, shuttle: 'reported', source: 'https://propertyhub.in.th/en/projects/the-waterford-park-sukhumvit-53', note: { th: 'มีข้อมูลกล่าวถึงรถรับส่ง แต่ยังไม่ยืนยันว่าฟรีหรือยังให้บริการอยู่', ja: '送迎の掲載あり。無料か・現行運行かは未確認' } },
+  { id: 6, rank: 10, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; ไม่ได้หมายความว่าไม่มีบริการ', ja: '無料送迎は確認できず。送迎なしと断定するものではありません' } },
+  { id: 9, rank: 11, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; ไม่ได้หมายความว่าไม่มีบริการ', ja: '無料送迎は確認できず。送迎なしと断定するものではありません' } },
+  { id: 12, rank: 12, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; ไม่ได้หมายความว่าไม่มีบริการ', ja: '無料送迎は確認できず。送迎なしと断定するものではありません' } },
+  { id: 10, rank: 13, shuttle: 'unverified', source: null, note: { th: 'ยังไม่มีหลักฐานยืนยันรถรับส่งฟรีสำหรับอาคารนี้', ja: 'この建物の無料送迎は未確認です' } },
+  { id: 11, rank: 14, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; อย่าสับสนกับ Waterford Sukhumvit 50', ja: '無料送迎は確認できず。近隣のWaterford Sukhumvit 50と混同しないでください' } },
+];
+for (const entry of window.PUBLIC_CONDOS) {
+  const recommendation = recommendations.find(item => item.id === entry.id);
+  Object.assign(entry, { recommendationRank: recommendation.rank, shuttle: recommendation });
+}
+window.PUBLIC_CONDOS.slice().sort((a, b) => b.building.lng - a.building.lng || a.id - b.id)
+  .forEach((entry, index) => { entry.mapNumber = index + 1; });
