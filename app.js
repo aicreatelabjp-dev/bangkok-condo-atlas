@@ -1,6 +1,6 @@
 (() => {
   const entries = window.PUBLIC_CONDOS;
-  const checked = '2026-10-02';
+  const checked = '2026-10-05';
   const copy = {
     th: { edition:'ฉบับตรวจสอบ · กันยายน 2026', eyebrow:'แผนที่เปรียบเทียบคอนโดมิเนียม', headline:'เลือกบ้านจากเมืองที่เป็นจริง', lead:'10 อาคาร · 10 ห้องที่ระบุชัด · แยกข้อมูลโครงการออกจากข้อมูลห้อง เพื่อเปรียบเทียบอย่างตรงไปตรงมา', stat:'โครงการในแผนที่', mapOver:'01 / LOCATION', mapHeading:'ตำแหน่งอาคาร', fit:'ดูทั้งหมด', mapUnavailable:'ไม่สามารถโหลดแผนที่ได้ โปรดดูรายการห้องและภาพรวมตำแหน่ง', mapNote:'หมุดแสดงตำแหน่งอาคาร ไม่ใช่สถานี ระยะทางอ้างอิงจากประกาศ ไม่ใช่ระยะเส้นตรงหรือเวลาเดิน', listOver:'02 / COMPARE', listHeading:'เปรียบเทียบห้อง', sort:'เรียงตาม', number:'หมายเลข', distance:'ระยะจากสถานี', year:'ปีสร้างล่าสุด', area:'พื้นที่มากที่สุด', property:'อาคาร / ห้อง', transit:'สถานี / ระยะตามประกาศ', yearHead:'ปี / อายุโดยประมาณ', areaHead:'พื้นที่ / ชั้น', facilities:'สระ · ซาวน่า · ทำงาน', unknown:'ยังไม่ยืนยัน', conflict:'ข้อมูลขัดแย้ง', yes:'มี', no:'ไม่มี', age:'ปี', floor:'ชั้น', pool:'สระว่ายน้ำ', sauna:'ซาวน่า', cowork:'โคเวิร์กกิ้ง', bath:'ออนเซ็น / อ่างรวม', details:'ข้อมูลเพิ่มเติม', unit:'ห้องที่ระบุ', building:'ข้อมูลอาคาร', photos:'ภาพถ่าย', photoHint:'เปิดหน้าประกาศแล้วกด Show all photos', photoUnavailable:'หน้าประกาศนี้ไม่แสดงปุ่ม Show all photos ในการตรวจสอบ', sources:'แหล่งข้อมูล', coordinate:'ตำแหน่งบนแผนที่', caveat:'พิกัดจากฐานข้อมูลภายนอก; ควรยืนยันตำแหน่งอาคารซ้ำก่อนตัดสินใจ', yearConflict:'แหล่งอื่นระบุ', checked:'ตรวจสอบข้อมูล:', footer:'ข้อมูลประกาศและสิ่งอำนวยความสะดวกอาจเปลี่ยนแปลง โปรดตรวจสอบกับผู้ขายและนิติบุคคลก่อนตัดสินใจ; “ยังไม่ยืนยัน” ไม่ได้หมายถึง “ไม่มี”', selected:'เลือกอาคารบนแผนที่หรือตารางเพื่อดูรายละเอียด', dataWarning:'ข้อมูลจากลิงก์ที่ระบุและชุดข้อมูลเริ่มต้นของผู้ใช้; พิกัดอาคารอ้างอิงแหล่งแผนที่แยกต่างหาก' },
     ja: { edition:'2026年9月 確認版', eyebrow:'バンコクのコンドミニアム比較地図', headline:'街から、住まいを選ぶ。', lead:'10建物・指定の10部屋。建物情報と部屋情報を分け、出典と未確認事項を明示します。', stat:'地図上の物件', mapOver:'01 / LOCATION', mapHeading:'建物の位置', fit:'全件表示', mapUnavailable:'地図を読み込めません。物件一覧と位置の全体図をご覧ください。', mapNote:'ピンは駅ではなく建物の位置です。駅距離は掲載元の数値で、直線距離や徒歩時間ではありません。', listOver:'02 / COMPARE', listHeading:'部屋を比較', sort:'並び替え', number:'番号順', distance:'駅距離順', year:'築浅順', area:'面積が広い順', property:'建物 / 部屋', transit:'駅 / 掲載距離', yearHead:'完成年 / 築約', areaHead:'面積 / 階', facilities:'プール · サウナ · コワーク', unknown:'未確認', conflict:'資料間で不一致', yes:'あり', no:'なし', age:'年', floor:'階', pool:'プール', sauna:'サウナ', cowork:'コワーク', bath:'共用浴場 / onsen', details:'詳細', unit:'指定の部屋', building:'建物の情報', photos:'写真', photoHint:'掲載ページで Show all photos を押してください', photoUnavailable:'確認時、この部屋ページに Show all photos ボタンは表示されませんでした', sources:'出典', coordinate:'ピン座標', caveat:'外部データベースの座標。意思決定前に建物位置を再確認してください', yearConflict:'別資料の記載', checked:'確認日:', footer:'掲載内容や設備の利用状況は変わり得ます。契約前に掲載元・管理組合へご確認ください。「未確認」は「なし」ではありません。', selected:'地図または表から物件を選ぶと詳細を表示します。', dataWarning:'指定された初期データと掲載元に基づく比較。建物座標は別の地図資料を参照。' }
@@ -13,6 +13,7 @@
   copy.ja.edition = '2026年10月 確認版';
   let language = 'th';
   let selected = entries.find(entry => entry.recommendationRank === 1).id;
+  let selectedListing = null;
   let sort = 'recommended';
   const voteKey = 'bangkok-condo-votes-v1';
   const visitorKey = 'bangkok-condo-visitor-v1';
@@ -52,7 +53,7 @@
   const num = n => Number(n).toLocaleString(language === 'th' ? 'th-TH' : 'ja-JP');
   const rent = amount => amount === null ? t('unknown') : `฿${num(amount)}${t('month')}`;
   const mapNumber = entry => String(entry.mapNumber).padStart(2, '0');
-  const rankLabel = entry => language === 'th' ? `อันดับแนะนำ ${entry.recommendationRank}` : `おすすめ ${entry.recommendationRank}位`;
+  const rankLabel = entry => entry.recommendationRank === null ? (language === 'th' ? 'ยังไม่จัดอันดับ' : '推奨順位未評価') : language === 'th' ? `อันดับแนะนำ ${entry.recommendationRank}` : `おすすめ ${entry.recommendationRank}位`;
   const shuttleBadge = entry => {
     const label = entry.shuttle.shuttle === 'free-advertised'
       ? (language === 'th' ? 'มีโฆษณารถรับส่งฟรี' : '無料送迎の広告あり')
@@ -148,24 +149,47 @@
     const alternate = String(building.yearConflict || '').match(/\b(?:19|20)\d{2}\b/);
     return alternate ? Math.min(building.year, Number(alternate[0])) : building.year;
   };
-  const order = () => [...entries].sort((a,b) => sort==='distance' ? a.building.distance-b.building.distance : sort==='year' ? completionYear(b.building)-completionYear(a.building) : sort==='area' ? b.unit.area-a.unit.area : sort==='number' ? a.mapNumber-b.mapNumber : a.recommendationRank-b.recommendationRank);
+  // Sort buildings first, then their eligible rooms by rent so groups never split.
+  const order = () => [...entries].sort((a,b) =>
+    (sort==='distance' ? a.building.distance-b.building.distance :
+      sort==='year' ? completionYear(b.building)-completionYear(a.building) :
+      sort==='area' ? Math.max(...b.publicUnits.map(u=>u.area))-Math.max(...a.publicUnits.map(u=>u.area)) :
+      sort==='number' ? a.mapNumber-b.mapNumber : (a.recommendationRank ?? Infinity)-(b.recommendationRank ?? Infinity)) || a.id-b.id
+  ).flatMap(entry => entry.publicUnits.map(unit => ({ ...entry, unit })));
   function rows() {
     $('table-head').innerHTML = ['propertyPrice','transit','yearHead','areaHead','facilities'].map(x=>`<th>${t(x)}</th>`).join('');
     $('table-body').innerHTML = order().map(e => `<tr data-id="${e.id}" class="${selected===e.id?'active':''}"><td><button type="button" class="row-pick" data-id="${e.id}" aria-label="${esc(e.name)}">${mapNumber(e)}</button><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer">${esc(e.name)} ↗</a><span class="recommendation-rank">${rankLabel(e)}</span><span class="rent-price">${rent(e.unit.rent)}</span>${rentNote(e.unit)?`<small>${rentNote(e.unit)}</small>`:''}${occupancyNote(e)?`<small class="occupancy-note">${esc(occupancyNote(e))}</small>`:''}</td><td><strong>${esc(e.building.station)}</strong><span>${num(e.building.distance)} m</span></td><td>${age(completionYear(e.building))}</td><td><strong>${num(e.unit.area)} m²</strong><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></td><td><div class="mini">${value(e.building.pool)} ${value(e.building.sauna)} ${value(e.building.cowork)} ${onsen(e.building)} ${shuttleBadge(e)}</div></td></tr>`).join('');
     $('cards').innerHTML = order().map(e => `<article data-id="${e.id}" class="card ${selected===e.id?'active':''}"><button type="button" class="card-select" data-id="${e.id}"><span class="card-number">${mapNumber(e)}</span><span><strong>${esc(e.name)}</strong><small>${rankLabel(e)} · ${esc(e.building.station)} · ${num(e.building.distance)} m</small></span><span class="arrow">↗</span></button><div class="card-facts"><span class="rent-price">${rent(e.unit.rent)}</span><span>${num(e.unit.area)} m²</span><span>${e.unit.floor===null?t('unknown'):`${num(e.unit.floor)} ${t('floor')}`}</span></div>${rentNote(e.unit)?`<p class="hint">${rentNote(e.unit)}</p>`:''}${occupancyNote(e)?`<p class="occupancy-note">${esc(occupancyNote(e))}</p>`:''}<div class="card-status">${t('pool')}: ${value(e.building.pool)} &nbsp; ${t('sauna')}: ${value(e.building.sauna)} &nbsp; ${t('cowork')}: ${value(e.building.cowork)} &nbsp; ${onsen(e.building)} &nbsp; ${shuttleBadge(e)}</div><a href="${e.unit.url}" target="_blank" rel="noopener noreferrer" class="listing-link">${t('photos')} ↗</a></article>`).join('');
-    document.querySelectorAll('.row-pick,.card-select').forEach(el=>el.addEventListener('click',()=>choose(Number(el.dataset.id),true)));
-    $('count').textContent = `${entries.length} / ${window.CONDOS.length}`;
+    for (const selector of ['.row-pick', '.card-select']) {
+      document.querySelectorAll(selector).forEach((el,index)=>el.addEventListener('click',()=>choose(Number(el.dataset.id),true,false,order()[index].unit.listingId)));
+    }
+    const notes = unit => [unit.note?.[language], unit.bathrooms ? `${unit.bathrooms} ${language==='th'?'ห้องน้ำ':'浴室'}` : '', unit.bathtub ? (language==='th'?'มีอ่างอาบน้ำ':'浴槽あり') : '', unit.leaseMonths ? (language==='th'?'สัญญา 1 ปี':'1年契約') : ''].filter(Boolean).join(' · ');
+    for (const selector of ['#table-body tr', '#cards article']) {
+      document.querySelectorAll(selector).forEach((el,index)=>{
+        const entry=order()[index];
+        const note=notes(entry.unit);
+        const target=selector.includes('tr') ? el.querySelector('td') : el;
+        if(note) target.insertAdjacentHTML('beforeend',`<p class="hint">${esc(note)}</p>`);
+        if(entry.building.distanceMode) target.insertAdjacentHTML('beforeend',`<p class="hint">${esc(entry.building.distanceMode[language])}</p>`);
+      });
+    }
+    $('count').textContent = language==='th' ? `${entries.length} อาคาร / ${window.PUBLIC_LISTINGS.length} ห้อง` : `${entries.length}建物 / ${window.PUBLIC_LISTINGS.length}部屋`;
   }
   function details() {
-    const e = entries.find(x=>x.id===selected), b=e.building, u=e.unit;
+    const buildingEntry = entries.find(x=>x.id===selected);
+    const u = buildingEntry.publicUnits.find(unit=>unit.listingId===selectedListing) || buildingEntry.publicUnits[0];
+    const e = { ...buildingEntry, unit: u }, b=e.building;
     $('detail').innerHTML = `<div class="detail-title"><span class="detail-num">${String(e.id).padStart(2,'0')}</span><div><p class="overline">${t('details')}</p><h2>${esc(e.name)}</h2></div></div><div class="detail-grid"><div><h3>${t('unit')}</h3><p>${num(u.area)} m² · ${u.floor===null?t('unknown'):`${num(u.floor)} ${t('floor')}`}</p><p class="rent-price">${rent(u.rent)}</p>${rentNote(u)?`<p class="hint">${rentNote(u)}</p>`:''}${occupancyNote(e)?`<p class="conflict-note">${esc(occupancyNote(e))}</p>`:''}<a href="${u.url}" target="_blank" rel="noopener noreferrer">${t('photos')} ↗</a><p class="hint">${e.gallery==='modal'?t('photoHint'):t('photoUnavailable')}</p></div><div><h3>${t('building')}</h3><dl><dt>${t('pool')}</dt><dd>${value(b.pool)}</dd><dt>${t('sauna')}</dt><dd>${value(b.sauna)}</dd><dt>${t('cowork')}</dt><dd>${value(b.cowork)}</dd><dt>${t('bath')}</dt><dd>${onsen(b)}</dd></dl>${b.onsen?`<p class="hint">${esc(b.onsen.note[language])}</p>`:''}<p>${esc(b.other[language])}</p></div><div><h3>${t('sources')}</h3><ul class="sources"><li><a href="${u.url}" target="_blank" rel="noopener noreferrer">${new URL(u.url).hostname} · ${t('unit')}</a></li><li><a href="${b.url}" target="_blank" rel="noopener noreferrer">${new URL(b.url).hostname} · ${t('building')}</a></li>${b.extra.map((url,i)=>`<li><a href="${url}" target="_blank" rel="noopener noreferrer">${new URL(url).hostname} · ${i+1}</a></li>`).join('')}<li><a href="${b.coordinateSource}" target="_blank" rel="noopener noreferrer">${t('coordinate')} · ${new URL(b.coordinateSource).hostname}</a></li></ul>${b.coordinateCaveat?`<p class="conflict-note">${t('caveat')}</p>`:''}<small>${t('checked')} ${checked}</small></div></div>`;
     $('detail').querySelector('.detail-title').insertAdjacentHTML('afterend', voteControls(e.id));
     $('detail').querySelector('.detail-num').textContent = mapNumber(e);
+    $('detail').insertAdjacentHTML('beforeend', `<div class="listing-options"><h3>${language==='th'?'ห้องทั้งหมดในอาคาร (ค่าเช่าจากน้อยไปมาก)':'この建物の募集（安い順）'}</h3>${buildingEntry.publicUnits.map(unit=>`<p><button type="button" data-listing="${esc(unit.listingId)}">${rent(unit.rent)} · ${num(unit.area)} m²</button> <a href="${esc(unit.url)}" target="_blank" rel="noopener noreferrer">${t('sources')} ↗</a>${unit.note?`<small> ${esc(unit.note[language])}</small>`:''}</p>`).join('')}${b.distanceMode?`<p>${esc(b.distanceMode[language])}</p>`:''}${b.yearConflict?`<p>${t('yearConflict')}: ${esc(b.yearConflict)} (${language==='th'?'แสดงปีที่เก่ากว่า':'古い年を表示'})</p>`:''}</div>`);
+    $('detail').querySelectorAll('[data-listing]').forEach(button=>button.addEventListener('click',()=>choose(e.id,false,false,button.dataset.listing)));
     $('detail').querySelector('.vote-controls').insertAdjacentHTML('afterend', `<div class="ranking-shuttle"><span class="recommendation-rank">${rankLabel(e)}</span>${shuttleDetail(e)}</div>`);
     $('detail').querySelectorAll('.vote-button').forEach(button => button.addEventListener('click', () => setVote(Number(button.dataset.id), button.dataset.vote)));
   }
-  function choose(id, fly, reveal=false) {
+  function choose(id, fly, reveal=false, listingId=null) {
     selected=id;
+    selectedListing=listingId;
     rows(); details(); mapVote();
     markers.forEach((m,k)=>m.getElement().querySelector('.pin').classList.toggle('active',k===id));
     document.querySelectorAll('.schematic-pin').forEach(button=>button.classList.toggle('active',Number(button.dataset.id)===id));
@@ -234,7 +258,7 @@
   }
   function render() {
     document.documentElement.lang=language;
-    $('lead').textContent = language === 'th' ? `${entries.length} อาคาร · ห้อง 2 ห้องนอน ค่าเช่าไม่เกิน ฿31,000/เดือน · แยกข้อมูลโครงการออกจากข้อมูลห้อง` : `${entries.length}建物・2ベッドルーム、月額賃料31,000バーツ以下の確認済み掲載部屋。建物情報と部屋情報を分けて表示します。`;
+    $('lead').textContent = language === 'th' ? `${entries.length} อาคาร · ${window.PUBLIC_LISTINGS.length} ห้อง · 2 ห้องนอน ค่าเช่าไม่เกิน ฿31,000/เดือน · ข้อมูลจากประกาศและผู้ใช้ โปรดยืนยันห้องว่าง` : `${entries.length}建物・${window.PUBLIC_LISTINGS.length}部屋。2ベッドルーム、月額31,000バーツ以下。掲載元・ユーザー提供情報に基づき、空室は要確認。`;
     document.querySelector('.stat strong').textContent=entries.length;
     for(const [id,key] of [['edition','edition'],['eyebrow','eyebrow'],['headline','headline'],['stat-label','stat'],['map-overline','mapOver'],['map-heading','mapHeading'],['fit-button','fit'],['map-note','mapNote'],['list-overline','listOver'],['list-heading','listHeading'],['sort-label','sort'],['footer-note','footer']]) $(id).textContent=t(key);
     $('footer-date').textContent=`${t('checked')} ${checked} · ${t('priceNote')} · ${t('dataWarning')}`;

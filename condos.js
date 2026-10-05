@@ -32,13 +32,42 @@ for (const entry of window.CONDOS) {
     entry.unit.priceCheckedAt = '2026-10-02';
   }
 }
-window.PUBLIC_CONDOS = window.CONDOS.filter(entry =>
-  entry.unit.bedrooms === 2 && Number.isFinite(entry.unit.rent) &&
-  entry.unit.rent > 0 && entry.unit.rent <= 31000 &&
-  typeof entry.unit.priceCheckedAt === 'string' &&
-  Date.now() + 86400000 >= Date.parse(entry.unit.priceCheckedAt) &&
-  Date.now() - Date.parse(entry.unit.priceCheckedAt) < 31 * 86400000
+// Independent listing records share building facts and the stable building vote ID.
+const facebookNote = {
+  th: 'ข้อมูลประกาศจากผู้ใช้; ยังตรวจสอบโพสต์และห้องซ้ำไม่ได้ โปรดยืนยันราคาและห้องว่างกับผู้ประกาศ',
+  ja: 'ユーザー提供の募集情報。投稿・同一室照合は未確認。賃料・空室は募集者へ要確認',
+};
+for (const entry of window.CONDOS) entry.units = [{ ...entry.unit, listingId: `legacy-${entry.id}` }];
+const vtara = window.CONDOS.find(entry => entry.id === 17);
+vtara.units[0].note = { th: 'ประกาศเดิมตรวจสอบราคา 2026-10-02; ยังเทียบห้องกับโพสต์ใหม่ไม่ได้ โปรดยืนยันห้องว่าง', ja: '既存募集の価格確認日2026-10-02。新投稿との同一室照合・現在の空室は要確認' };
+vtara.units.push(
+  { listingId: 'fb-1ErKPqgSij', bedrooms: 2, bathrooms: null, area: 50, floor: null, rent: 23000, priceCheckedAt: '2026-10-05', note: facebookNote, url: 'https://www.facebook.com/share/p/1ErKPqgSij/?mibextid=wwXIfr' },
+  { listingId: 'fb-1A9Yq99LHn', bedrooms: 2, bathrooms: 2, area: 50, floor: null, rent: 25000, leaseMonths: 12, priceCheckedAt: '2026-10-05', note: facebookNote, url: 'https://www.facebook.com/share/p/1A9Yq99LHn/' }
 );
+const mobi = window.CONDOS.find(entry => entry.id === 14);
+mobi.building.yearConflict = '2018';
+mobi.building.extra.push('https://www.hipflat.com/projects/ideo-mobi-sukhumvit-66-lbanvm');
+mobi.units.push({ listingId: 'fb-1EWeLVosWT', bedrooms: 2, bathrooms: 1, area: 52.06, floor: 9, rent: 27000, bathtub: true, priceCheckedAt: '2026-10-05', note: facebookNote, url: 'https://www.facebook.com/share/p/1EWeLVosWT/' });
+const riverUrl = 'https://www.fazwaz.com/projects/thailand/bangkok/bang-kho-laem/bang-kho-laem/river-heaven';
+const riverUnit = { listingId: 'fb-1HZ7bJwzB9', bedrooms: 2, bathrooms: 1, area: 65, floor: 6, rent: 29500, leaseMonths: 12, bathtub: true, priceCheckedAt: '2026-10-05', note: facebookNote, url: 'https://www.facebook.com/share/p/1HZ7bJwzB9/' };
+window.CONDOS.push({ id: 18, name: 'River Heaven', building: { year: 2003, station: 'BTS Saphan Taksin', distance: 4100, distanceMode: { th: 'ระยะทางโดยรถตามแหล่งข้อมูล ไม่ใช่ระยะเดิน', ja: '掲載資料の車移動距離。徒歩距離ではありません' }, pool: 'yes', sauna: 'yes', cowork: 'unknown', bath: 'unknown', other: { th: 'ฟิตเนส สวน เทนนิส บาสเกตบอล ร้านอาหาร; โพสต์ระบุโคเวิร์กกิ้ง/ห้องสมุด แต่ข้อมูลอาคารยังไม่ยืนยัน จำนวนสระยังไม่ยืนยัน', ja: 'ジム・庭・テニス・バスケットボール・館内飲食店。コワーク・図書室は募集投稿に記載、建物資料で裏づけ未確認。プール数は未確認' }, lat: 13.7011013, lng: 100.5014005, coordinateSource: 'https://propertyhub.in.th/en/projects/river-heaven', url: riverUrl, extra: ['https://www.hipflat.com/projects/river-heaven-wjgvwl'] }, unit: riverUnit, units: [riverUnit], gallery: 'unavailable' });
+window.isPublicUnit = unit => unit.bedrooms === 2 && Number.isFinite(unit.rent) &&
+  unit.rent > 0 && unit.rent <= 31000 && typeof unit.priceCheckedAt === 'string' &&
+  Date.now() + 86400000 >= Date.parse(unit.priceCheckedAt) &&
+  Date.now() - Date.parse(unit.priceCheckedAt) < 31 * 86400000;
+window.PUBLIC_CONDOS = window.CONDOS.filter(entry => {
+  const bySource = new Map();
+  for (const unit of entry.units.filter(window.isPublicUnit)) {
+    const url = new URL(unit.url);
+    url.searchParams.delete('mibextid');
+    url.hash = '';
+    const key = url.href;
+    const previous = bySource.get(key);
+    if (!previous || unit.priceCheckedAt > previous.priceCheckedAt) bySource.set(key, unit);
+  }
+  entry.publicUnits = [...bySource.values()].sort((a, b) => a.rent - b.rent || a.listingId.localeCompare(b.listingId));
+  return entry.publicUnits.length > 0;
+});
 window.REVIEW_CONDOS = window.CONDOS.filter(entry => !window.PUBLIC_CONDOS.includes(entry));
 
 // Stable IDs remain unchanged for saved votes. Map numbers are geographic labels only.
@@ -59,8 +88,9 @@ const recommendations = [
   { id: 11, rank: 14, shuttle: 'unverified', source: null, note: { th: 'ยังไม่พบหลักฐานยืนยันรถรับส่งฟรี; อย่าสับสนกับ Waterford Sukhumvit 50', ja: '無料送迎は確認できず。近隣のWaterford Sukhumvit 50と混同しないでください' } },
 ];
 for (const entry of window.PUBLIC_CONDOS) {
-  const recommendation = recommendations.find(item => item.id === entry.id);
+  const recommendation = recommendations.find(item => item.id === entry.id) || { rank: null, shuttle: 'unverified', source: null, note: { th: 'ยังไม่ยืนยันรถรับส่งฟรี; อาคารนี้ยังไม่ได้จัดอันดับ', ja: '無料送迎は未確認。この建物は推奨順位未評価' } };
   Object.assign(entry, { recommendationRank: recommendation.rank, shuttle: recommendation });
 }
 window.PUBLIC_CONDOS.slice().sort((a, b) => b.building.lng - a.building.lng || a.id - b.id)
   .forEach((entry, index) => { entry.mapNumber = index + 1; });
+window.PUBLIC_LISTINGS = window.PUBLIC_CONDOS.flatMap(entry => entry.publicUnits.map(unit => ({ ...entry, unit })));
