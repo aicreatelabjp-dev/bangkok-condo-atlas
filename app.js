@@ -11,6 +11,8 @@
   };
   copy.th.edition = 'ฉบับตรวจสอบ · ตุลาคม 2026';
   copy.ja.edition = '2026年10月 確認版';
+  copy.th.rankingNote = 'อันดับอาคาร: สิ่งอำนวยความสะดวก → ปีสร้างใหม่กว่า → เวลาไปสถานีสั้นกว่า; ไม่ใช้ค่าเช่าหรือขนาดห้อง และไม่รับประกันการเปิดใช้ปัจจุบัน';
+  copy.ja.rankingNote = '建物順位は共用設備→同評価なら完成年が新しい順→同年なら駅までの所要時間順。家賃・面積は評価に含めず、設備の現在稼働を保証しません。';
   let language = 'th';
   let selected = entries.find(entry => entry.recommendationRank === 1).id;
   let selectedListing = null;
@@ -261,7 +263,7 @@
     $('lead').textContent = language === 'th' ? `${entries.length} อาคาร · ${window.PUBLIC_LISTINGS.length} ห้อง · 2 ห้องนอน ค่าเช่าไม่เกิน ฿31,000/เดือน · ข้อมูลจากประกาศและผู้ใช้ โปรดยืนยันห้องว่าง` : `${entries.length}建物・${window.PUBLIC_LISTINGS.length}部屋。2ベッドルーム、月額31,000バーツ以下。掲載元・ユーザー提供情報に基づき、空室は要確認。`;
     document.querySelector('.stat strong').textContent=entries.length;
     for(const [id,key] of [['edition','edition'],['eyebrow','eyebrow'],['headline','headline'],['stat-label','stat'],['map-overline','mapOver'],['map-heading','mapHeading'],['fit-button','fit'],['map-note','mapNote'],['list-overline','listOver'],['list-heading','listHeading'],['sort-label','sort'],['footer-note','footer']]) $(id).textContent=t(key);
-    $('footer-date').textContent=`${t('checked')} ${checked} · ${t('priceNote')} · ${t('dataWarning')}`;
+    $('footer-date').textContent=`${t('checked')} ${checked} · ${t('rankingNote')} · ${t('priceNote')} · ${t('dataWarning')}`;
     [...$('sort').options].forEach(o=>o.textContent=t(o.value));
     $('lang-th').setAttribute('aria-pressed',String(language==='th'));
     $('lang-ja').setAttribute('aria-pressed',String(language==='ja'));
